@@ -1,5 +1,9 @@
 const ClothingItem = require("../models/clothingItem");
-const { INTERNAL_SERVER_ERROR_STATUS_CODE } = require("../utils/errors");
+const {
+  BAD_REQUEST_STATUS_CODE,
+  NOT_FOUND_STATUS_CODE,
+  INTERNAL_SERVER_ERROR_STATUS_CODE,
+} = require("../utils/errors");
 
 const createItem = (req, res) => {
   console.log(req);
@@ -13,9 +17,7 @@ const createItem = (req, res) => {
       res.send({ data: item });
     })
     .catch((err) => {
-      res
-        .status(INTERNAL_SERVER_ERROR_STATUS_CODE)
-        .send({ message: err.message });
+      res.status(BAD_REQUEST_STATUS_CODE).send({ message: err.message });
     });
 };
 
@@ -38,7 +40,18 @@ const updateItem = (req, res) => {
     .orFail()
     .then((item) => res.status(200).send({ data: item }))
     .catch((err) => {
-      res
+      if (err.name === "DocumentNotFoundError") {
+        return res
+          .status(NOT_FOUND_STATUS_CODE)
+          .send({ message: "User not found" });
+      }
+
+      if (err.name === "CastError") {
+        return res
+          .status(BAD_REQUEST_STATUS_CODE)
+          .send({ message: err.message });
+      }
+      return res
         .status(INTERNAL_SERVER_ERROR_STATUS_CODE)
         .send({ message: err.message });
     });
@@ -50,9 +63,20 @@ const deleteItem = (req, res) => {
   console.log(itemId);
   ClothingItem.findByIdAndDelete(itemId)
     .orFail()
-    .then(() => res.status(204).send({}))
+    .then(() => res.status(200).send({ message: "Item deleted successfully" }))
     .catch((err) => {
-      res
+      if (err.name === "DocumentNotFoundError") {
+        return res
+          .status(NOT_FOUND_STATUS_CODE)
+          .send({ message: "User not found" });
+      }
+
+      if (err.name === "CastError") {
+        return res
+          .status(BAD_REQUEST_STATUS_CODE)
+          .send({ message: err.message });
+      }
+      return res
         .status(INTERNAL_SERVER_ERROR_STATUS_CODE)
         .send({ message: err.message });
     });
