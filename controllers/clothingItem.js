@@ -1,4 +1,5 @@
 const ClothingItem = require("../models/clothingItem");
+const { INTERNAL_SERVER_ERROR_STATUS_CODE } = require("../utils/errors");
 
 const createItem = (req, res) => {
   console.log(req);
@@ -12,7 +13,9 @@ const createItem = (req, res) => {
       res.send({ data: item });
     })
     .catch((err) => {
-      res.status(500).send({ message: err.message });
+      res
+        .status(INTERNAL_SERVER_ERROR_STATUS_CODE)
+        .send({ message: err.message });
     });
 };
 
@@ -21,7 +24,9 @@ const getItems = (req, res) => {
     .then((items) => res.status(200).send(items))
     .catch((err) => {
       console.error(err);
-      return res.status(500).send({ message: err.message });
+      return res
+        .status(INTERNAL_SERVER_ERROR_STATUS_CODE)
+        .send({ message: err.message });
     });
 };
 
@@ -33,7 +38,9 @@ const updateItem = (req, res) => {
     .orFail()
     .then((item) => res.status(200).send({ data: item }))
     .catch((err) => {
-      res.status(500).send({ message: err.message });
+      res
+        .status(INTERNAL_SERVER_ERROR_STATUS_CODE)
+        .send({ message: err.message });
     });
 };
 
@@ -45,7 +52,9 @@ const deleteItem = (req, res) => {
     .orFail()
     .then((item) => res.status(204).send({}))
     .catch((err) => {
-      res.status(500).send({ message: err.message });
+      res
+        .status(INTERNAL_SERVER_ERROR_STATUS_CODE)
+        .send({ message: err.message });
     });
 };
 
